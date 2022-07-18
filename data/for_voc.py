@@ -5,6 +5,9 @@
 import os
 import csv
 import numpy as np
+from torch.utils.data import Dataset, DataLoader
+import pandas as pd
+from torchvision.io import read_image
 
 CLASS_NAME = ['person',
               'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
@@ -36,6 +39,31 @@ def write_train_label(annotation_path, images_path):
         csvwriter.writerows(label)
 
 
+class VOCClassifyDataset(Dataset):
+    def __init__(self, img_dir, annotations_file, transform=None, target_transform=None):
+        self.img_dir = img_dir
+        # 跳过表头
+        self.img_labels = pd.read_csv(annotations_file, header=None)
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __getitem__(self, item):
+        img_path = os.path.join(self.img_dir, self.img_labels.iloc[item, 0])
+        image = read_image(img_path)
+        label = self.img_labels.iloc[item][1:]
+        if self.transform:
+            image = self.transform(image)
+        if self.target_transform:
+            label = self.target_transform(label)
+        return image, label
+
+    def __len__(self):
+        return len(self.img_labels)
+        pass
+
+
 if __name__ == '__main__':
-    write_train_label(ANNOTATION_PATH, IMAGES_PATH)
+    # write_train_label(ANNOTATION_PATH, IMAGES_PATH)
+    vocdataset = VOCClassifyDataset(IMAGES_PATH, 'label.csv')
+    img, label = vocdataset[0]
     pass
