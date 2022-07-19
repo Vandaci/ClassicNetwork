@@ -17,6 +17,7 @@ CLASS_NAME = ['person',
               'bottle', 'chair', 'diningtable', 'pottedplant', 'sofa', 'tvmonitor']
 ANNOTATION_PATH = r'D:\Datasets\PascalVOC\2007\VOCdevkit\VOC2007\ImageSets\Main'
 IMAGES_PATH = r'D:\Datasets\PascalVOC\2007\VOCdevkit\VOC2007\JPEGImages'
+DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 
 def write_train_label(annotation_path, images_path):
@@ -70,6 +71,6 @@ if __name__ == '__main__':
     # write_train_label(ANNOTATION_PATH, IMAGES_PATH)
 
     # transform = torchvision.transforms.ToTensor()
-    vocdataset = VOCClassifyDataset(IMAGES_PATH, 'label.csv',)
+    vocdataset = VOCClassifyDataset(IMAGES_PATH, 'label.csv', )
     img, label = vocdataset[0]
     pass
