@@ -5,9 +5,11 @@
 import os
 import csv
 import numpy as np
+import torchvision.transforms
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 from torchvision.io import read_image
+import torch
 
 CLASS_NAME = ['person',
               'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
@@ -49,8 +51,11 @@ class VOCClassifyDataset(Dataset):
 
     def __getitem__(self, item):
         img_path = os.path.join(self.img_dir, self.img_labels.iloc[item, 0])
-        image = read_image(img_path)
-        label = self.img_labels.iloc[item][1:]
+        image = read_image(img_path) / 255.0
+        label = self.img_labels.iloc[item].iloc[1:]
+        label = np.array(label, dtype=float)
+        label = torch.tensor(label)
+        # label = label.iloc[1:]
         if self.transform:
             image = self.transform(image)
         if self.target_transform:
@@ -59,11 +64,12 @@ class VOCClassifyDataset(Dataset):
 
     def __len__(self):
         return len(self.img_labels)
-        pass
 
 
 if __name__ == '__main__':
     # write_train_label(ANNOTATION_PATH, IMAGES_PATH)
-    vocdataset = VOCClassifyDataset(IMAGES_PATH, 'label.csv')
+
+    # transform = torchvision.transforms.ToTensor()
+    vocdataset = VOCClassifyDataset(IMAGES_PATH, 'label.csv',)
     img, label = vocdataset[0]
     pass
